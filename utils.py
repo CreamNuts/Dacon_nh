@@ -13,8 +13,9 @@ def train(epoch, train_loader, optimizer, model, device):
         labels = batch['labels'].to(device)
         outputs = model(input_ids, attention_mask=attention_mask, labels=labels)
         loss = outputs[0]
-        loss_list.append(loss)
         loss.backward()
+        loss_list.append(loss)
+        optimizer.step()
         pbar.set_description(f'Epoch {epoch}, Loss : {loss:.3f}')
     epoch_loss = sum(loss_list)/len(train_loader)
     return epoch_loss
