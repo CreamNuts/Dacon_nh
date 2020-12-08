@@ -5,6 +5,7 @@ from tqdm import tqdm
 def train(epoch, train_loader, optimizer, model, device):
     pbar = tqdm(train_loader, desc=f'Epoch {epoch}, Loss : ')
     loss_list = []
+    model.train()
     for batch in pbar:
         optimizer.zero_grad()
         input_ids = batch['input_ids'].to(device)
