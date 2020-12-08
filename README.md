@@ -1,4 +1,4 @@
-# Dacon: [AI야, 진짜 뉴스를 찾아줘!](AI야, 진짜 뉴스를 찾아줘!)
+# Dacon: [AI야, 진짜 뉴스를 찾아줘!](https://dacon.io/competitions/official/235658/overview/)
 ## 진행 과정
 * 데이터셋 구조 : test와 sample_submission의 샘플 순서가 같으므로, test시 suffle않고 추론후 그대로 sample_submission에 붙여넣음
     ```shell
