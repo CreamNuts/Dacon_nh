@@ -16,7 +16,7 @@ def train(epoch, train_loader, optimizer, model, device):
         loss.backward()
         loss_list.append(loss)
         optimizer.step()
-        pbar.set_description(f'Epoch {epoch}, Loss : {loss:.3f}')
+        pbar.set_description(f'Epoch {epoch}, Loss : {loss:.5f}')
     epoch_loss = sum(loss_list)/len(train_loader)
     return epoch_loss
 
@@ -32,7 +32,7 @@ def val(val_loader, model, device):
             outputs = model(input_ids, attention_mask=attention_mask)
             num_iter += 1
             acc_list.append(torch.sum(torch.max(outputs[0], dim=1)[1].cpu() == batch['labels'])/len(batch['labels']))
-            pbar.set_description(f'Evaluation Acc : {sum(acc_list)/num_iter:.3f}')
+            pbar.set_description(f'Evaluation Acc : {sum(acc_list)/num_iter:.5f}')
     return sum(acc_list)/num_iter #total acc
 
 def test(test_loader, model, device):
