@@ -44,4 +44,5 @@ optional arguments:
   --epoch 5
 ```
 
-* test가 submission.csv를 만드는 것이므로 data_dir를 ./data/news_test.csv로 바꿔야함
+* ~~test가 submission.csv를 만드는 것이므로 data_dir를 ./data/news_test.csv로 바꿔야함~~
+  > test의 경우 data_dir 수정 안해도 미리 선언한 test 경로로 가도록 수정

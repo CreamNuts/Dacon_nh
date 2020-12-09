@@ -19,6 +19,13 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=int, metavar=5, default=5)
     args = parser.parse_args()
 
+    torch.manual_seed(777)
+    torch.cuda.manual_seed(777)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+    np.random.seed(777)
+    random.seed(777)
+
     if args.gpu == None:
         device = torch.device('cpu')
     else:
@@ -43,6 +50,7 @@ if __name__ == '__main__':
             save(model, epoch, args.mode, args.save)
 
     else:
+        args.data_dir = './data/news_test.csv'
         test_loader, _ = create_loader(args.data_dir, args.mode, batch_size=args.batchsize)
         info_list = test(test_loader, model, device)
         submission = pd.read_csv('./data/sample_submission.csv')
