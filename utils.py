@@ -2,10 +2,11 @@ import torch
 from pathlib import Path
 from tqdm import tqdm
 
-def train(epoch, train_loader, optimizer, model, device):
+def train(epoch, train_loader, val_loader, optimizer, model, device, writer=None):
     pbar = tqdm(train_loader, desc=f'Epoch {epoch}, Loss : ')
     loss_list = []
     model.train()
+    num_iter = epoch*len(train_loader)
     for batch in pbar:
         optimizer.zero_grad()
         input_ids = batch['input_ids'].to(device)
@@ -17,8 +18,18 @@ def train(epoch, train_loader, optimizer, model, device):
         loss_list.append(loss)
         optimizer.step()
         pbar.set_description(f'Epoch {epoch}, Loss : {loss:.5f}')
+        
+        if writer is not None:
+            writer.add_scalar('training loss per batch', loss, num_iter)
+        if (val_loader is not None) and (num_iter % 1000 == 0):
+            val_acc = val(val_loader, model, device)
+            if writer is not None:
+                writer.add_scalar('validation acc per 1000 iter', val_acc, num_iter)
+        
+        num_iter += 1
     epoch_loss = sum(loss_list)/len(train_loader)
-    return epoch_loss
+    if writer is not None:
+                writer.add_scalar('training avg loss per epoch', epoch_loss, epoch)
 
 def val(val_loader, model, device):
     pbar = tqdm(val_loader, desc='Evaluation Acc')
@@ -33,6 +44,7 @@ def val(val_loader, model, device):
             num_iter += 1
             acc_list.append(torch.sum(torch.max(outputs[0], dim=1)[1].cpu() == batch['labels'])/len(batch['labels']))
             pbar.set_description(f'Evaluation Acc : {sum(acc_list)/num_iter:.5f}')
+    model.train()
     return sum(acc_list)/num_iter #total acc
 
 def test(test_loader, model, device):

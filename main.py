@@ -5,6 +5,7 @@ from utils import train, val, test, save
 from dataset import create_loader
 from tqdm import tqdm, trange
 from transformers import BertForSequenceClassification, DistilBertForSequenceClassification, AdamW
+from torch.utils.tensorboard import SummaryWriter
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -15,6 +16,7 @@ if __name__ == '__main__':
     parser.add_argument('--load', metavar='None', default=None, help='To continue your training, put your checkpoint dir')
     parser.add_argument('--save', metavar='./Checkpoint.pt', default='./Checkpoint.pt', help='Save directory')
     parser.add_argument('--gpu', metavar=0, default='0', help='GPU number to use. If None, use CPU')
+    parser.add_argument('--tensorboard', metavar=True, default=True, help='If True, use Tensorboard')
     parser.add_argument('--batchsize', type=int, metavar=32, default=32, help='Train batch size')
     parser.add_argument('--lr', type=float, metavar=5e-5, default=5e-5)
     parser.add_argument('--epoch', type=int, metavar=5, default=5)
@@ -25,6 +27,10 @@ if __name__ == '__main__':
     torch.backends.cudnn.benchmark = False
     np.random.seed(777)
     random.seed(777)
+
+    if args.tensorboard is True:
+        writer = SummaryWriter(f'runs/{args.model}_{args.mode}_{args.lr}_{args.batchsize}')
+    else: writer = None
 
     if args.gpu == None:
         device = torch.device('cpu')
@@ -46,10 +52,16 @@ if __name__ == '__main__':
     if args.mode != 'test':
         train_loader, val_loader = create_loader(args.data_dir, args.mode, batch_size=args.batchsize, ratio=args.ratio)
         optimizer = AdamW(model.parameters(), lr=args.lr)
+        num_iter = 0
         for epoch in range(args.epoch):
-            train(epoch, train_loader, optimizer, model, device)
-            if args.mode == 'val':
-                val(val_loader, model, device)
+            train(epoch, train_loader, val_loader, optimizer, model, device, writer)
+            # if writer is not None:
+            #     writer.add_scalar('training avg loss per epoch', epoch_loss, epoch)
+
+            # if (args.mode == 'val') and (num_iter%1000 == 0):
+            #     val_acc = val(val_loader, model, device)
+            #     if writer is not None:
+            #         writer.add_scalar('validation acc per 1000 iter', val_acc, num_iter)
             save(model, epoch, args.mode, args.save)
 
     else:
