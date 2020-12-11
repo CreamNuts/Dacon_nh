@@ -6,7 +6,7 @@ sklearn==0.0
 tensorboard==2.4.0
 tokenizers==0.9.4
 torch==1.7.0
-torchaudio==0.7.0a0+ac17b64
+torchaudio==0.7.0
 torchvision==0.8.1
 tqdm==4.54.1
 transformers==4.0.0
