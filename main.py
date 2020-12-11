@@ -37,7 +37,7 @@ if __name__ == '__main__':
     else:
         os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
         device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('use: ',device)
+    print('use: ', device)
     
     if args.model == 'kobert':
         model = BertForSequenceClassification.from_pretrained(f'monologg/{args.model}').to(device)
@@ -52,17 +52,8 @@ if __name__ == '__main__':
     if args.mode != 'test':
         train_loader, val_loader = create_loader(args.data_dir, args.mode, batch_size=args.batchsize, ratio=args.ratio)
         optimizer = AdamW(model.parameters(), lr=args.lr)
-        num_iter = 0
         for epoch in range(args.epoch):
-            train(epoch, train_loader, val_loader, optimizer, model, device, writer)
-            # if writer is not None:
-            #     writer.add_scalar('training avg loss per epoch', epoch_loss, epoch)
-
-            # if (args.mode == 'val') and (num_iter%1000 == 0):
-            #     val_acc = val(val_loader, model, device)
-            #     if writer is not None:
-            #         writer.add_scalar('validation acc per 1000 iter', val_acc, num_iter)
-            save(model, epoch, args.mode, args.save)
+            train(epoch, train_loader, val_loader, optimizer, model, device, args.save, writer)
 
     else:
         args.data_dir = './data/news_test.csv'

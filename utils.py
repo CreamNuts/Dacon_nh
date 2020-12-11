@@ -2,7 +2,7 @@ import torch
 from pathlib import Path
 from tqdm import tqdm
 
-def train(epoch, train_loader, val_loader, optimizer, model, device, writer=None):
+def train(epoch, train_loader, val_loader, optimizer, model, device, save_dir, writer=None):
     pbar = tqdm(train_loader, desc=f'Epoch {epoch}, Loss : ')
     loss_list = []
     model.train()
@@ -18,18 +18,24 @@ def train(epoch, train_loader, val_loader, optimizer, model, device, writer=None
         loss_list.append(loss)
         optimizer.step()
         pbar.set_description(f'Epoch {epoch}, Loss : {loss:.5f}')
-        
         if writer is not None:
             writer.add_scalar('training loss per batch', loss, num_iter)
         if (val_loader is not None) and (num_iter % 1000 == 0):
             val_acc = val(val_loader, model, device)
+            save(model, num_iter, 'val_iter', save_dir)
             if writer is not None:
                 writer.add_scalar('validation acc per 1000 iter', val_acc, num_iter)
-        
         num_iter += 1
-    epoch_loss = sum(loss_list)/len(train_loader)
+        
+    if val_loader is None:
+        save(model, epoch, 'train', save_dir)
+    else:
+        save(model, epoch, 'val', save_dir)
+
     if writer is not None:
-                writer.add_scalar('training avg loss per epoch', epoch_loss, epoch)
+        epoch_loss = sum(loss_list)/len(train_loader)
+        writer.add_scalar('training avg loss per epoch', epoch_loss, epoch)
+
 
 def val(val_loader, model, device):
     pbar = tqdm(val_loader, desc='Evaluation Acc')
