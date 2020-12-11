@@ -9,7 +9,7 @@ from transformers import BertForSequenceClassification, DistilBertForSequenceCla
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['train', 'val', 'test'], help='train: Use total dataset, val: Hold-out of 0.8 ratio, test: Make submission')
-    parser.add_argument('--model', required=True, choices=['kobert', 'distilkobert'], help='Select model')
+    parser.add_argument('--model', required=True, choices=['bert', 'kobert', 'distilkobert'], help='Select model')
     parser.add_argument('--ratio', type=float, metavar=0.8, default=0.8, help='Hold out ratio in val mode')
     parser.add_argument('--data_dir', metavar='./data/news_train.csv', default='./data/news_train.csv', help="Dataset Directory")
     parser.add_argument('--load', metavar='None', default=None, help='To continue your training, put your checkpoint dir')
@@ -21,7 +21,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     torch.manual_seed(777)
-    torch.cuda.manual_seed(777)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
     np.random.seed(777)
@@ -38,6 +37,9 @@ if __name__ == '__main__':
         model = BertForSequenceClassification.from_pretrained(f'monologg/{args.model}').to(device)
     elif args.model == 'distilkobert':
         model = DistilBertForSequenceClassification.from_pretrained(f'monologg/{args.model}').to(device)
+    elif args.model == 'bert':
+        model = BertForSequenceClassification.from_pretrained(f'bert-base-multilingual-cased').to(device)
+
     if args.load is not None:
         model.load_state_dict(torch.load(args.load))
 
