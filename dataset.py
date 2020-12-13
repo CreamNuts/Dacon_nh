@@ -1,9 +1,8 @@
 import torch
 import pandas as pd
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from kobert_transformers import get_tokenizer
-from torch.utils.data import DataLoader
 
 class NewsDataset(Dataset):
     def __init__(self, encodings, labels=None):
