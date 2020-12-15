@@ -36,6 +36,7 @@ if __name__ == '__main__':
         device = torch.device('cpu')
     else:
         device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
+        torch.cuda.set_device(device)
     print('use: ', device)
     
     if args.model == 'kobert':
