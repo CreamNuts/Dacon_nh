@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_dir', metavar='./data/news_train.csv', default='./data/news_train.csv', help="Dataset Directory")
     parser.add_argument('--load', metavar='None', default=None, help='To continue your training, put your checkpoint dir')
     parser.add_argument('--save', metavar='./Checkpoint.pt', default='./Checkpoint.pt', help='Save directory')
-    parser.add_argument('--gpu', metavar=0, default='0', help='GPU number to use. If None, use CPU')
+    parser.add_argument('--gpu', metavar=0, default=0, help='GPU number to use. If None, use CPU')
     parser.add_argument('--tensorboard', metavar=True, default=True, help='If True, use Tensorboard')
     parser.add_argument('--batchsize', type=int, metavar=32, default=32, help='Train batch size')
     parser.add_argument('--lr', type=float, metavar=5e-5, default=5e-5)
@@ -35,8 +35,7 @@ if __name__ == '__main__':
     if args.gpu == None:
         device = torch.device('cpu')
     else:
-        os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
-        device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        device = torch.device(f'cuda:{args.gpu}' if torch.cuda.is_available() else 'cpu')
     print('use: ', device)
     
     if args.model == 'kobert':
