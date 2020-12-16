@@ -3,6 +3,7 @@ import pandas as pd
 from torch.utils.data import Dataset, DataLoader
 from sklearn.model_selection import train_test_split
 from kobert_transformers import get_tokenizer
+from transformers import ElectraTokenizer
 
 class NewsDataset(Dataset):
     def __init__(self, encodings, labels=None):
@@ -18,9 +19,11 @@ class NewsDataset(Dataset):
             item['labels'] = torch.tensor(self.labels[idx])
         return item
 
-def create_loader(data_dir, mode, batch_size, ratio=0.8):
+def create_loader(data_dir, model, mode, batch_size, ratio=0.8):
     dataset = pd.read_csv(data_dir)
-    tokenizer = get_tokenizer()
+    if 'bert' in model:
+        tokenizer = get_tokenizer()
+    else: tokenizer = ElectraTokenizer.from_pretrained("monologg/koelectra-base-v3-discriminator")
     if mode == 'train':
         data, data_label = dataset['content'], dataset['info']
         encodings = tokenizer(list(data.values), truncation=True, padding=True)

@@ -4,13 +4,13 @@ import pandas as pd
 from utils import train, val, test, save
 from dataset import create_loader
 from tqdm import tqdm, trange
-from transformers import BertForSequenceClassification, DistilBertForSequenceClassification, AdamW
+from transformers import BertForSequenceClassification, DistilBertForSequenceClassification, ElectraForSequenceClassification, AdamW
 from torch.utils.tensorboard import SummaryWriter
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['train', 'val', 'test'], help='train: Use total dataset, val: Hold-out of 0.8 ratio, test: Make submission')
-    parser.add_argument('--model', required=True, choices=['bert', 'kobert', 'distilkobert'], help='Select model')
+    parser.add_argument('--model', required=True, choices=['bert', 'kobert', 'distilkobert', 'distilbert', 'smallkoelectra'], help='Select model')
     parser.add_argument('--ratio', type=float, metavar=0.8, default=0.8, help='Hold out ratio in val mode')
     parser.add_argument('--data_dir', metavar='./data/news_train.csv', default='./data/news_train.csv', help="Dataset Directory")
     parser.add_argument('--load', metavar='None', default=None, help='To continue your training, put your checkpoint dir')
@@ -28,9 +28,6 @@ if __name__ == '__main__':
     np.random.seed(777)
     random.seed(777)
 
-    if args.tensorboard is True:
-        writer = SummaryWriter(f'runs/{args.model}_{args.mode}_{args.lr}_{args.batchsize}')
-    else: writer = None
 
     if args.gpu == None:
         device = torch.device('cpu')
@@ -45,19 +42,26 @@ if __name__ == '__main__':
         model = DistilBertForSequenceClassification.from_pretrained(f'monologg/{args.model}').to(device)
     elif args.model == 'bert':
         model = BertForSequenceClassification.from_pretrained(f'bert-base-multilingual-cased').to(device)
+    elif args.model == 'distilbert':
+        model = DistilBertForSequenceClassification.from_pretrained(f'distilbert-base-multilingual-cased').to(device)        
+    elif args.model == 'smallkoelectra':
+        model = ElectraForSequenceClassification.from_pretrained("monologg/koelectra-small-v3-discriminator").to(device)
 
     if args.load is not None:
         model.load_state_dict(torch.load(args.load))
 
     if args.mode != 'test':
-        train_loader, val_loader = create_loader(args.data_dir, args.mode, batch_size=args.batchsize, ratio=args.ratio)
+        if args.tensorboard is True:
+            writer = SummaryWriter(f'runs/{args.model}_{args.mode}_{args.lr}_{args.batchsize}')
+        else: writer = None
+        train_loader, val_loader = create_loader(args.data_dir, args.model, args.mode, batch_size=args.batchsize, ratio=args.ratio)
         optimizer = AdamW(model.parameters(), lr=args.lr)
         for epoch in range(args.epoch):
             train(epoch, train_loader, val_loader, optimizer, model, device, args.save, writer)
 
     else:
         args.data_dir = './data/news_test.csv'
-        test_loader, _ = create_loader(args.data_dir, args.mode, batch_size=args.batchsize)
+        test_loader, _ = create_loader(args.data_dir, args.model, args.mode, batch_size=args.batchsize)
         info_list = test(test_loader, model, device)
         submission = pd.read_csv('./data/sample_submission.csv')
         submission['info'] = info_list.cpu()
