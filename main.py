@@ -4,17 +4,17 @@ import pandas as pd
 from utils import train, val, test, save
 from dataset import create_loader
 from tqdm import tqdm, trange
-from transformers import BertForSequenceClassification, DistilBertForSequenceClassification, ElectraForSequenceClassification, AdamW
+from transformers import BertForSequenceClassification, DistilBertForSequenceClassification, ElectraForSequenceClassification, AlbertForSequenceClassification, AdamW
 from torch.utils.tensorboard import SummaryWriter
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('mode', choices=['train', 'val', 'test'], help='train: Use total dataset, val: Hold-out of 0.8 ratio, test: Make submission')
-    parser.add_argument('--model', required=True, choices=['bert', 'kobert', 'distilkobert', 'distilbert', 'smallkoelectra'], help='Select model')
+    parser.add_argument('--model', required=True, choices=['bert', 'kobert', 'distilkobert', 'distilbert', 'smallkoelectra', 'albert'], help='Select model')
     parser.add_argument('--ratio', type=float, metavar=0.8, default=0.8, help='Hold out ratio in val mode')
     parser.add_argument('--data_dir', metavar='./data/news_train.csv', default='./data/news_train.csv', help="Dataset Directory")
     parser.add_argument('--load', metavar='None', default=None, help='To continue your training, put your checkpoint dir')
-    parser.add_argument('--save', metavar='./Checkpoint.pt', default='./Checkpoint.pt', help='Save directory')
+    parser.add_argument('--save', metavar='./checkpoint', default='./checkpoint', help='Save directory name')
     parser.add_argument('--gpu', metavar=0, default=0, help='GPU number to use. If None, use CPU')
     parser.add_argument('--tensorboard', metavar=True, default=True, help='If True, use Tensorboard')
     parser.add_argument('--batchsize', type=int, metavar=32, default=32, help='Train batch size')
@@ -46,6 +46,8 @@ if __name__ == '__main__':
         model = DistilBertForSequenceClassification.from_pretrained(f'distilbert-base-multilingual-cased').to(device)        
     elif args.model == 'smallkoelectra':
         model = ElectraForSequenceClassification.from_pretrained("monologg/koelectra-small-v3-discriminator").to(device)
+    elif args.model == 'albert':
+        model = AlbertForSequenceClassification.from_pretrained("albert-base-v2").to(device)
 
     if args.load is not None:
         model.load_state_dict(torch.load(args.load))

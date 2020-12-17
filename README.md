@@ -21,9 +21,10 @@ $ python3 main.py -h
 ```
 
 ```console
-usage: main.py [-h] --model {bert,kobert,distilkobert} [--ratio 0.8]
-               [--data_dir ./data/news_train.csv] [--load None]
-               [--save ./Checkpoint.pt] [--gpu 0] [--tensorboard True]
+usage: main.py [-h] --model
+               {bert,kobert,distilkobert,distilbert,smallkoelectra,albert}
+               [--ratio 0.8] [--data_dir ./data/news_train.csv] [--load None]
+               [--save ./checkpoint] [--gpu 0] [--tensorboard True]
                [--batchsize 32] [--lr 5e-05] [--epoch 5]
                {train,val,test}
 
@@ -33,14 +34,13 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --model {bert,kobert,distilkobert}
+  --model {bert,kobert,distilkobert,distilbert,smallkoelectra,albert}
                         Select model
   --ratio 0.8           Hold out ratio in val mode
   --data_dir ./data/news_train.csv
                         Dataset Directory
   --load None           To continue your training, put your checkpoint dir
-  --save ./Checkpoint.pt
-                        Save directory
+  --save ./checkpoint   Save directory name
   --gpu 0               GPU number to use. If None, use CPU
   --tensorboard True    If True, use Tensorboard
   --batchsize 32        Train batch size
@@ -51,3 +51,5 @@ optional arguments:
 * ~~test가 submission.csv를 만드는 것이므로 data_dir를 ./data/news_test.csv로 바꿔야함~~
   > test의 경우 data_dir 수정 안해도 미리 선언한 test 경로로 가도록 수정
 * Tensorboard 추가
+* Albert, smallkoelectra 추가
+* save_dir을 디렉토리 이름 받는 것으로 수정

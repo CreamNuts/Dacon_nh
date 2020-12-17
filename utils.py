@@ -67,7 +67,13 @@ def test(test_loader, model, device):
 
 def save(model, epoch, mode, save_dir):
     save_dir = Path(save_dir)
-    file_name = save_dir.stem + f'_{mode}_{epoch}.pt'
-    new_dir = save_dir.parent / file_name
+    try:
+        if not save_dir.exists():
+            save_dir.mkdir()
+    except:
+        print(f'Error: Creating directory. {save_dir}')
+
+    file_name = f'{mode}_{epoch}.pt'
+    new_dir = save_dir / file_name
     torch.save(model.state_dict(), new_dir)
     print(f'Save your model as {new_dir}')
