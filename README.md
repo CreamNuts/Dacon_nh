@@ -14,6 +14,8 @@
 * .py로 변환 후 시드 고정했을때 Kobert가 제대로 학습되지 않음. 특정 시드에서는 학슴이 안되고 특정 시드는 2 epoch까지 성능이 향상되다가 이후 trainloss가 크게 높아지면서 val acc도 함께 낮아짐. 원인 불명
 * Distilkobert 7 epoch이 public 0.9877로 현재 최고 성능. Kobert의 학습 실패 원인을 찾기위해 추가적으로 다른 모델은 돌려보지 않음.
   > Bert-Multiligual에서도 비슷한 현상이 발견됨. Train loss도 같이 높아지므로 Overfit은 아닌것 같은데... 면밀한 loss 확인을 위해 배치당 loss를 시각화하고 validation 주기를 줄여서 확인할 예정
+* **대회 끝! 자연어 맛보기로 적절했음. 예선은 통과했으나 추가 개선점이 떠오르지 않아 포기...**
+
 
 ## 사용 방법
 ```shell
