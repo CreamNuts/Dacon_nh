@@ -7,3 +7,5 @@ submission.csv
 .vscode/settings.json
 nh.code-workspace
 *.pyc
+*.xlsx
+*.csv
